@@ -1,0 +1,36 @@
+{
+  "experimento": "baseline_cnn",
+  "epocas_ejecutadas": 17,
+  "mejor_val_loss": 0.13126085698604584,
+  "parametros": {
+    "total": 28145,
+    "entrenables": 27921,
+    "no_entrenables": 224
+  },
+  "tiempos": {
+    "epocas_medidas": 17,
+    "segundos_por_epoca_media": 435.3993460823583,
+    "segundos_por_epoca_min": 426.6744359000004,
+    "segundos_por_epoca_max": 487.9431447000243,
+    "segundos_totales": 7401.788883400091
+  },
+  "dispositivo": {
+    "dispositivo": "CPU",
+    "n_gpus": 0,
+    "nombres_gpu": [],
+    "version_tf": "2.19.0",
+    "python": "3.11.9",
+    "so": "Windows 10",
+    "cpu": "AMD64 Family 23 Model 160 Stepping 0, AuthenticAMD"
+  },
+  "subset": null,
+  "batch_size": 32,
+  "tasa_aprendizaje": 0.001,
+  "pesos_clase": {
+    "0": 0.847798008416316,
+    "1": 1.2188080263551961
+  },
+  "n_train": 40696,
+  "n_val": 8721,
+  "n_test": 8721
+}

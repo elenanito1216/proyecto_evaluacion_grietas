@@ -1,0 +1,118 @@
+{
+  "experimento": "mobilenetv2",
+  "epocas_ejecutadas": 15,
+  "mejor_val_loss": 0.09411504864692688,
+  "parametros": {
+    "total": 1464113,
+    "entrenables": 1013489,
+    "no_entrenables": 450624
+  },
+  "tiempos": {
+    "epocas_medidas": 10,
+    "segundos_por_epoca_media": 473.18433086998414,
+    "segundos_por_epoca_min": 469.1313158000121,
+    "segundos_por_epoca_max": 489.37899539998034,
+    "segundos_totales": 4731.843308699841
+  },
+  "dispositivo": {
+    "dispositivo": "CPU",
+    "n_gpus": 0,
+    "nombres_gpu": [],
+    "version_tf": "2.19.0",
+    "python": "3.11.9",
+    "so": "Windows 10",
+    "cpu": "AMD64 Family 23 Model 160 Stepping 0, AuthenticAMD"
+  },
+  "arquitectura_base": "MobileNetV2",
+  "alpha": 0.75,
+  "nota_arquitectura": "EfficientNet-Lite no esta disponible en keras.applications; se uso MobileNetV2, estandar de facto para inferencia movil.",
+  "subset": null,
+  "batch_size": 32,
+  "lr_etapa1": 0.001,
+  "lr_etapa2": 1e-05,
+  "epocas_etapa1": 10,
+  "epocas_etapa2": 5,
+  "capas_descongeladas": 19,
+  "tiempos_etapa1": {
+    "epocas_medidas": 10,
+    "segundos_por_epoca_media": 473.18433086998414,
+    "segundos_por_epoca_min": 469.1313158000121,
+    "segundos_por_epoca_max": 489.37899539998034,
+    "segundos_totales": 4731.843308699841
+  },
+  "tiempos_etapa2": {
+    "epocas_medidas": 5,
+    "segundos_por_epoca_media": 507.31152016000124,
+    "segundos_por_epoca_min": 445.5200228000176,
+    "segundos_por_epoca_max": 560.3291566999978,
+    "segundos_totales": 2536.557600800006
+  },
+  "metricas_val_congelado": {
+    "umbral": 0.5,
+    "n_muestras": 8721,
+    "accuracy": 0.9618163054695562,
+    "precision": 0.9853425067304816,
+    "recall": 0.9206260480715484,
+    "f1": 0.951885565669701,
+    "especificidad": 0.9904724868753646,
+    "balanced_accuracy": 0.9555492674734565,
+    "roc_auc": 0.9891383676706452,
+    "pr_auc": 0.9881494093564981,
+    "matriz_confusion": {
+      "vn": 5094,
+      "fp": 49,
+      "fn": 284,
+      "vp": 3294
+    },
+    "matriz_confusion_lista": [
+      [
+        5094,
+        49
+      ],
+      [
+        284,
+        3294
+      ]
+    ],
+    "tasa_falsos_negativos": 0.07937395192845165,
+    "tasa_falsos_positivos": 0.009527513124635427
+  },
+  "metricas_val_finetuned": {
+    "umbral": 0.5,
+    "n_muestras": 8721,
+    "accuracy": 0.9677789244352711,
+    "precision": 0.992236488504031,
+    "recall": 0.9287311347121296,
+    "f1": 0.9594340984553198,
+    "especificidad": 0.9949445848726425,
+    "balanced_accuracy": 0.961837859792386,
+    "roc_auc": 0.9917662292748248,
+    "pr_auc": 0.9907691735751791,
+    "matriz_confusion": {
+      "vn": 5117,
+      "fp": 26,
+      "fn": 255,
+      "vp": 3323
+    },
+    "matriz_confusion_lista": [
+      [
+        5117,
+        26
+      ],
+      [
+        255,
+        3323
+      ]
+    ],
+    "tasa_falsos_negativos": 0.07126886528787033,
+    "tasa_falsos_positivos": 0.005055415127357573
+  },
+  "pesos_clase": {
+    "0": 0.847798008416316,
+    "1": 1.2188080263551961
+  },
+  "n_train": 40696,
+  "n_val": 8721,
+  "n_test": 8721,
+  "modelo_final": "mobilenetv2_finetuned.keras"
+}

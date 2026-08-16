@@ -1,0 +1,34 @@
+# Tema base de la aplicacion.
+#
+# Define solo los colores fundamentales; el resto del acabado (tarjetas,
+# sombras, semaforo) lo aporta app/estilos.py, que deriva sus colores de las
+# variables CSS que Streamlit publica a partir de este bloque. Asi, cambiar el
+# tema aqui -o desde el menu "Settings" de la propia aplicacion- reajusta toda
+# la interfaz sin tocar el CSS.
+
+[theme]
+base = "dark"
+primaryColor = "#22B8CF"           # acento primario (cian)
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#161B22"
+textColor = "#E6EDF3"
+font = "sans serif"
+
+[server]
+# La aplicacion se ejecuta en local durante la sustentacion; sin telemetria ni
+# recoleccion de estadisticas de uso.
+headless = false
+maxUploadSize = 10                 # MB; coincide con app.max_mb_subida de config.yaml
+
+[browser]
+gatherUsageStats = false
+
+[client]
+# Los errores se muestran completos en pantalla: durante el desarrollo en VS Code
+# es mas util ver la traza que un mensaje generico.
+showErrorDetails = true
+toolbarMode = "minimal"
+
+[runner]
+# Evita reejecutar el script entero cuando solo cambia un modulo importado.
+fastReruns = true

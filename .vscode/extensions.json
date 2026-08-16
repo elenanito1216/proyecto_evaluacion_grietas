@@ -1,0 +1,14 @@
+{
+  // Extensiones que VS Code sugerira al abrir el proyecto. Son exactamente las
+  // que necesitan settings.json y launch.json para funcionar tal como estan
+  // configurados.
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "ms-python.black-formatter",
+    "charliermarsh.ruff",
+    "ms-toolsai.jupyter",
+    "redhat.vscode-yaml"
+  ]
+}

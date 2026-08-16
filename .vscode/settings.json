@@ -1,0 +1,82 @@
+{
+  // ==========================================================================
+  // Configuracion de VS Code para este proyecto.
+  //
+  // Las rutas usan ${workspaceFolder} y separadores "/": funcionan igual en
+  // Windows, Linux y macOS. Este archivo SI se versiona: forma parte de la
+  // configuracion reproducible del entorno de desarrollo.
+  // ==========================================================================
+
+  // --- Interprete: el del entorno virtual local, nunca el del sistema -------
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+
+  // --- Analisis estatico ----------------------------------------------------
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.extraPaths": ["${workspaceFolder}"],
+
+  // --- Formateo al guardar con Black ---------------------------------------
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    },
+    "editor.rulers": [100],
+    "editor.tabSize": 4
+  },
+  "black-formatter.args": ["--line-length", "100"],
+
+  // --- Linter: Ruff ---------------------------------------------------------
+  "ruff.enable": true,
+  "ruff.lint.run": "onType",
+  "ruff.organizeImports": true,
+
+  // --- Pruebas --------------------------------------------------------------
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+
+  // --- Notebooks ------------------------------------------------------------
+  // El notebook de EDA se ejecuta con la extension Jupyter de VS Code, en local.
+  // No se usa Colab ni ningun servicio en la nube.
+  "jupyter.notebookFileRoot": "${workspaceFolder}",
+  "notebook.formatOnSave.enabled": true,
+  "notebook.codeActionsOnSave": {
+    "notebook.source.organizeImports": "explicit"
+  },
+  "notebook.output.textLineLimit": 40,
+
+  // --- Archivos -------------------------------------------------------------
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/.ipynb_checkpoints": true
+  },
+  "search.exclude": {
+    "**/.venv": true,
+    "**/data": true,
+    "**/models": true
+  },
+
+  // --- Terminal integrado ---------------------------------------------------
+  // PowerShell por defecto en Windows; el README documenta la activacion en
+  // Linux y macOS.
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+
+  // --- YAML -----------------------------------------------------------------
+  "[yaml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  }
+}

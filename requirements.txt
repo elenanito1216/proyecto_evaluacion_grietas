@@ -1,0 +1,56 @@
+# =============================================================================
+# Dependencias directas del proyecto, con versiones fijadas.
+#
+# Se fijan con "==" a proposito: un proyecto que se evalua por reproducibilidad
+# no puede permitir que "pip install" traiga una version distinta la semana que
+# viene y cambie los resultados. Las versiones aqui son exactamente las que se
+# usaron para generar los artefactos de reports/.
+#
+# Instalacion (con el entorno virtual ya activado):
+#     pip install -r requirements.txt
+#
+# El archivo requirements-lock.txt contiene ademas todas las dependencias
+# transitivas resueltas; usalo si necesitas reproducir el entorno bit a bit.
+# =============================================================================
+
+# --- Deep learning -----------------------------------------------------------
+# TensorFlow 2.19 incluye Keras 3.x. En Windows nativo funciona solo en CPU:
+# desde TF 2.11 el soporte de GPU en Windows requiere WSL2. Es lo esperado.
+# Requiere Python 3.10-3.12 (no hay ruedas para 3.13+ en esta version).
+tensorflow==2.19.0
+# Nota sobre versiones futuras: `tf.lite.Interpreter` esta marcado como obsoleto
+# en 2.19 y desaparece en TF 2.20, sustituido por el paquete `ai-edge-litert`.
+# Si actualizas TensorFlow, habra que anadir esa dependencia y cambiar las dos
+# construcciones del interprete en src/models/inferencia.py y
+# src/eval/complejidad.py. Por eso la version esta fijada en 2.19.
+
+# --- Computo numerico y datos ------------------------------------------------
+numpy==2.1.3            # TF 2.19 exige numpy>=1.26,<2.2
+pandas==2.2.3
+scikit-learn==1.5.2
+
+# --- Vision por computador ---------------------------------------------------
+opencv-python==4.10.0.84
+
+# --- Visualizacion -----------------------------------------------------------
+matplotlib==3.9.2       # figuras estaticas del informe
+seaborn==0.13.2         # matriz de confusion y graficos del EDA
+plotly==5.24.1          # graficos interactivos de la aplicacion
+
+# --- Aplicacion --------------------------------------------------------------
+streamlit==1.39.0
+Pillow==10.4.0          # decodificacion robusta de las imagenes subidas
+
+# --- Configuracion y utilidades ----------------------------------------------
+PyYAML==6.0.2
+tqdm==4.66.5
+psutil==6.1.0           # medicion del pico de memoria en inferencia
+
+# --- Notebook de EDA (extension Jupyter de VS Code) --------------------------
+ipykernel==6.29.5
+nbformat==5.10.4
+
+# --- Calidad de codigo y pruebas ---------------------------------------------
+black==24.10.0
+ruff==0.7.4
+pytest==8.3.3

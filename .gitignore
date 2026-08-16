@@ -1,0 +1,91 @@
+# =============================================================================
+# .gitignore
+#
+# Criterio: el repositorio versiona CODIGO y ARTEFACTOS PEQUENOS DE TEXTO
+# (metricas en JSON/CSV, figuras del informe). No versiona el entorno, ni el
+# dataset, ni los pesos de los modelos: son grandes, binarios y reproducibles a
+# partir del codigo mas el config.yaml.
+# =============================================================================
+
+# --- Entorno virtual ---------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# --- Datos -------------------------------------------------------------------
+# El dataset publico se descarga; las fotos propias del equipo se guardan
+# aparte. Ninguno de los dos entra al control de versiones, pero SI se versiona
+# la estructura de carpetas (via .gitkeep) para que quien clone el repositorio
+# sepa donde va cada cosa.
+#
+# Nota: se excluye "data/*" y no "data/", porque Git no vuelve a examinar el
+# contenido de un directorio ya excluido y las reglas de reinclusion (!) de
+# dentro no tendrian ningun efecto.
+data/*
+!data/raw/
+!data/propias/
+data/raw/*
+data/propias/*
+!data/raw/.gitkeep
+!data/propias/.gitkeep
+
+# --- Modelos entrenados ------------------------------------------------------
+# Los .keras y los checkpoints pesan decenas de MB. Los .tflite son mucho mas
+# pequenos, pero se regeneran con un comando: tampoco se versionan.
+models/*.keras
+models/*.tflite
+models/*.h5
+models/*.pb
+models/checkpoints/
+models/saved_model/
+!models/.gitkeep
+
+# --- Reportes ----------------------------------------------------------------
+# SI se versionan: las metricas en JSON/CSV y las figuras. Son el resultado del
+# trabajo y la app los consume. Solo se excluyen los volcados intermedios.
+reports/**/*.tmp
+reports/**/.ipynb_checkpoints/
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Jupyter -----------------------------------------------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# --- TensorFlow / Keras ------------------------------------------------------
+logs/
+*.tfevents.*
+
+# --- Streamlit ---------------------------------------------------------------
+# El tema (config.toml) SI se versiona; los secretos nunca.
+.streamlit/secrets.toml
+
+# --- Sistema operativo -------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# --- Editores ----------------------------------------------------------------
+# .vscode/ SI se versiona: settings.json y launch.json son parte de la
+# configuracion reproducible del proyecto. Solo se excluye lo personal.
+.vscode/*.log
+.idea/
+*.swp
+*~

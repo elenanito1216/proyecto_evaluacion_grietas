@@ -1,0 +1,142 @@
+{
+  // ==========================================================================
+  // Configuraciones de depuracion (F5) para cada script del proyecto.
+  //
+  // "cwd": "${workspaceFolder}" en todas: los scripts resuelven sus rutas de
+  // forma relativa a la raiz del repositorio, asi que depurar desde otro
+  // directorio rompería la carga del config.yaml.
+  //
+  // "justMyCode": false permite entrar con el depurador en el codigo de
+  // TensorFlow y OpenCV cuando hace falta entender un fallo desde dentro.
+  // ==========================================================================
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "0 · Verificar entorno",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/verificar_entorno.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": true
+    },
+    {
+      "name": "1 · Entrenar linea base (ensayo rapido, 10%)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train_baseline.py",
+      "args": ["--config", "config.yaml", "--subset", "0.1", "--epochs", "3"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "2 · Entrenar linea base (completo)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train_baseline.py",
+      "args": ["--config", "config.yaml"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "3 · Entrenar MobileNetV2 (ensayo rapido, 10%)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train_transfer.py",
+      "args": ["--config", "config.yaml", "--subset", "0.1", "--epochs", "2", "--epochs-ft", "1"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "4 · Entrenar MobileNetV2 (completo)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train_transfer.py",
+      "args": ["--config", "config.yaml"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "5 · Reanudar entrenamiento interrumpido",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train_baseline.py",
+      "args": ["--config", "config.yaml", "--resume"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "6 · Exportar a TensorFlow Lite",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/export_tflite.py",
+      "args": ["--config", "config.yaml"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "7 · Evaluar todos los modelos",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/evaluate.py",
+      "args": ["--config", "config.yaml"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "8 · Validar inclinometria (rotaciones conocidas)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/validar_inclinacion.py",
+      "args": [
+        "--config",
+        "config.yaml",
+        "--imagenes",
+        "data/propias",
+        "--guardar-anotadas"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "9 · Streamlit: lanzar la app en el depurador",
+      "type": "debugpy",
+      "request": "launch",
+      // Se depura el MODULO streamlit, no app.py directamente: ejecutar app.py
+      // como script normal no arranca el servidor y el archivo falla al
+      // encontrar el contexto de sesion.
+      "module": "streamlit",
+      "args": ["run", "app/app.py", "--server.headless", "false"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "10 · Pytest: todas las pruebas",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests", "-v"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    },
+    {
+      "name": "11 · Archivo actual (generico)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    }
+  ]
+}

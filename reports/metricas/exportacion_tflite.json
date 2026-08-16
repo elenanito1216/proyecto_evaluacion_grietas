@@ -1,0 +1,16 @@
+{
+  "modelo_origen": "mobilenetv2_finetuned.keras",
+  "tamano_keras_mb": 13.901,
+  "artefactos": {
+    "float32": {
+      "archivo": "mobilenetv2_float32.tflite",
+      "tamano_mb": 5.4641
+    },
+    "int8": {
+      "archivo": "mobilenetv2_int8.tflite",
+      "tamano_mb": 1.7395,
+      "io_int8": false,
+      "muestras_calibracion": 200
+    }
+  }
+}

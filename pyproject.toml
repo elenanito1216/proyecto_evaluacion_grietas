@@ -1,0 +1,71 @@
+# =============================================================================
+# Configuracion de las herramientas de calidad de codigo.
+#
+# Vive aqui y no en la configuracion de VS Code para que las mismas reglas
+# apliquen tanto al formatear con la extension como al ejecutar `black .` o
+# `ruff check .` desde la terminal, y para que sean identicas en el equipo de
+# cualquier integrante.
+# =============================================================================
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.venv
+  | data
+  | models
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [".venv", "data", "models", ".ipynb_checkpoints"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle: errores
+    "W",    # pycodestyle: avisos
+    "F",    # pyflakes
+    "I",    # isort: orden de imports
+    "B",    # flake8-bugbear: fallos logicos frecuentes
+    "UP",   # pyupgrade: sintaxis moderna
+    "D",    # pydocstyle: docstrings
+    "ANN",  # flake8-annotations: type hints
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "D203",    # incompatible con D211 (una de las dos hay que elegir)
+    "D212",    # se usa el estilo Google: resumen en la segunda linea
+    "D415",    # el resumen no siempre termina en punto en espanol
+    "ANN401",  # 'Any' es legitimo en las fronteras con TensorFlow y Streamlit
+    "ANN101",  # anotar 'self' no aporta nada; la propia Ruff dejo obsoleta la regla
+    "ANN102",  # idem para 'cls'
+    "E501",    # la longitud de linea la impone Black, no el linter
+    "B008",    # llamadas en valores por defecto: patron habitual de argparse
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Los scripts insertan la raiz en sys.path antes de importar 'src', asi que sus
+# imports no pueden ir todos arriba del archivo.
+"scripts/*.py" = ["E402"]
+"app/*.py" = ["E402"]
+# Las pruebas no necesitan docstring en cada funcion de aserto.
+"tests/*.py" = ["D103", "ANN201"]
+"notebooks/*" = ["D", "ANN", "E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    # TensorFlow y protobuf emiten avisos de deprecacion que no dependen de
+    # este proyecto y ensucian la salida de las pruebas.
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]

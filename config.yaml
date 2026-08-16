@@ -1,0 +1,288 @@
+# =============================================================================
+# Configuracion unica del proyecto
+# "Deteccion de Grietas e Inclinacion de Elementos Estructurales
+#  para la Evaluacion de Riesgo en Edificaciones"
+#
+# Universidad Industrial de Santander - Ingenieria en Inteligencia Artificial
+# Asignatura: Algoritmos y Programacion (2026-2)
+#
+# REGLA DEL PROYECTO: ningun script, modulo o notebook debe contener rutas
+# absolutas ni hiperparametros incrustados. Todo vive aqui. Las rutas se
+# interpretan SIEMPRE como relativas a la raiz del repositorio (la carpeta que
+# contiene este archivo), resueltas con pathlib en src/utils/rutas.py.
+# =============================================================================
+
+proyecto:
+  nombre: "crack-risk-assessment"
+  # Semilla global: se propaga a numpy, random, tensorflow y al split.
+  # Cambiarla aqui es la unica forma legitima de cambiar la aleatoriedad.
+  semilla: 42
+
+# -----------------------------------------------------------------------------
+# RUTAS (relativas a la raiz del repo)
+# -----------------------------------------------------------------------------
+rutas:
+  # Dataset publico etiquetado (Concrete Crack Images / SDNET2018 o similar).
+  # Admite dos estructuras, detectadas automaticamente por src/data/loader.py:
+  #   (a) subcarpetas por clase:  data/raw/Positive/*.jpg  y  data/raw/Negative/*.jpg
+  #   (b) CSV de etiquetas:       data/raw/labels.csv  con columnas configuradas abajo
+  datos_raw: "data/raw"
+
+  # Fotografias tomadas por el equipo. SOLO se usan como conjunto de prueba
+  # final; nunca entran al entrenamiento ni a la validacion. Misma estructura
+  # que datos_raw (subcarpetas por clase o CSV).
+  datos_propias: "data/propias"
+
+  modelos: "models"
+  reportes: "reports"
+  figuras: "reports/figuras"
+  metricas: "reports/metricas"
+
+# -----------------------------------------------------------------------------
+# CARGA DE DATOS
+# -----------------------------------------------------------------------------
+datos:
+  # Nombres canonicos de las clases. El indice en esta lista ES la etiqueta
+  # entera: 0 = sin grieta, 1 = con grieta. La clase positiva (grieta) debe ser
+  # la ultima porque el modelo es binario con salida sigmoide.
+  clases: ["Negative", "Positive"]
+
+  # Alias aceptados al detectar subcarpetas (comparacion en minusculas, sin
+  # acentos). Cubre las variantes mas comunes de los datasets publicos.
+  alias_clases:
+    Negative: ["negative", "negativo", "no_crack", "nocrack", "sin_grieta", "uncracked", "0"]
+    Positive: ["positive", "positivo", "crack", "cracked", "con_grieta", "grieta", "1"]
+
+  # Solo se usa si NO hay subcarpetas por clase y si existe un CSV.
+  csv:
+    nombre_archivo: "labels.csv"   # se busca dentro de rutas.datos_raw
+    columna_imagen: "filename"
+    columna_etiqueta: "label"
+
+  extensiones: [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"]
+
+  # Split estratificado. train + val + test debe sumar 1.0
+  split:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+    # Si el dataset son recortes (patches) de una misma superficie/foto madre,
+    # un split aleatorio produce FUGA DE DATOS: parches casi identicos caen en
+    # train y en test a la vez y la exactitud queda inflada.
+    # Con agrupar_por_origen: true, el split se hace por grupo (todos los
+    # parches de una misma superficie caen en la misma particion).
+    agrupar_por_origen: false
+    # Expresion regular aplicada al nombre del archivo (sin extension) para
+    # extraer el identificador de la superficie de origen. El grupo 1 de la
+    # regex es el identificador. Ejemplo para nombres tipo "CD_0042_03.jpg":
+    #   "^([A-Za-z]+_\\d+)"  ->  agrupa "CD_0042"
+    regex_origen: "^([A-Za-z]+[_-]?\\d+)"
+
+# -----------------------------------------------------------------------------
+# PREPROCESAMIENTO Y AUMENTO
+# -----------------------------------------------------------------------------
+preproceso:
+  # COMPROMISO RESOLUCION <-> DESEMPENO (justificado en reports/analisis.md):
+  # 160x160 conserva la firma de una grieta fina (bordes de alta frecuencia,
+  # ~2-4 px de ancho) y cuesta ~2.0x menos computo que 224x224
+  # (160^2/224^2 = 0.51). Con 128x128 el costo baja otro 36%, pero las grietas
+  # capilares empiezan a perderse por submuestreo. 160 es el punto de equilibrio
+  # para entrenar en CPU sin sacrificar recall en la clase peligrosa.
+  alto: 160
+  ancho: 160
+  canales: 3
+
+  # Rango de normalizacion. "0_1" divide por 255. "menos1_1" mapea a [-1, 1],
+  # que es el preprocesado nativo de MobileNetV2 (tf.keras.applications
+  # .mobilenet_v2.preprocess_input). La linea base usa 0_1.
+  # El modelo de transfer learning inserta su capa de preprocesado internamente,
+  # por lo que el pipeline entrega SIEMPRE tensores en [0, 1] y cada modelo
+  # ajusta el rango que necesita. Asi la app solo tiene que normalizar una vez.
+  normalizacion: "0_1"
+
+  aumento:
+    activo: true          # se aplica UNICAMENTE al split de entrenamiento
+    volteo_horizontal: true
+    volteo_vertical: true  # valido aqui: una grieta no tiene "arriba" canonico
+    rotacion: 0.10        # fraccion de 2*pi -> +-36 grados
+    zoom: 0.10
+    contraste: 0.15
+    brillo: 0.15
+    traslacion: 0.05
+
+  # tf.data
+  barajar_buffer: 2000
+  cache: false             # pon false si el dataset no cabe en RAM
+  prefetch: true
+
+# -----------------------------------------------------------------------------
+# ENTRENAMIENTO
+# -----------------------------------------------------------------------------
+entrenamiento:
+  # Lote pequeno: en CPU un lote grande no acelera y dispara el uso de RAM.
+  batch_size: 32
+  epocas: 20
+  tasa_aprendizaje: 0.001
+  # Fraccion del dataset usada cuando se pasa --subset por CLI sin valor.
+  subset_por_defecto: 0.1
+
+  callbacks:
+    early_stopping:
+      activo: true
+      monitor: "val_loss"
+      paciencia: 5
+      restaurar_mejores_pesos: true
+    reduce_lr:
+      activo: true
+      monitor: "val_loss"
+      factor: 0.5
+      paciencia: 2
+      lr_minimo: 0.0000001
+    checkpoint:
+      activo: true
+      monitor: "val_loss"
+      guardar_solo_mejor: false   # false => se guarda cada epoca => se puede reanudar
+
+  # Pesos de clase: si el dataset esta desbalanceado, penaliza mas el error en
+  # la clase positiva (grieta). "auto" los calcula con sklearn; null los desactiva.
+  pesos_clase: "auto"
+
+# Linea base: CNN pequena entrenada desde cero. Es el punto de comparacion
+# exigido por la asignatura, no un modelo candidato a produccion.
+baseline:
+  nombre: "baseline_cnn"
+  filtros: [16, 32, 64]      # 3 bloques conv -> ~100k parametros
+  kernel: 3
+  dropout: 0.3
+  unidades_densa: 64
+
+# Transfer learning
+transfer:
+  nombre: "mobilenetv2"
+  # NOTA: EfficientNet-Lite NO esta expuesto en keras.applications (solo existe
+  # como modelo de TF Hub / TFLite Model Maker). Se usa MobileNetV2, que es el
+  # estandar de facto para inferencia movil y esta disponible nativamente.
+  arquitectura_base: "MobileNetV2"
+  alpha: 0.75            # width multiplier: 0.75 recorta ~44% de parametros
+  pesos: "imagenet"
+  dropout: 0.3
+  unidades_densa: 64
+
+  fine_tuning:
+    activo: true
+    # Cuantas capas finales de la base se descongelan. MobileNetV2 tiene 154
+    # capas; descongelar las ultimas ~30 equivale a los 2-3 bloques finales.
+    capas_a_descongelar: 30
+    tasa_aprendizaje: 0.00001   # 1e-5: LR alto aqui destruye los pesos preentrenados
+    epocas: 10
+
+# -----------------------------------------------------------------------------
+# EVALUACION
+# -----------------------------------------------------------------------------
+evaluacion:
+  # Umbral de decision por defecto para P(grieta).
+  # 0.5 es el neutral; bajarlo aumenta recall (menos falsos negativos) a costa
+  # de precision. En seguridad estructural el falso negativo es el error caro.
+  umbral: 0.5
+  # Recall minimo que se quiere garantizar en la clase "con grieta" al buscar
+  # automaticamente un umbral operativo sobre la curva precision-recall.
+  recall_objetivo: 0.95
+
+complejidad:
+  repeticiones_latencia: 60   # >= 50 exigidas por el enunciado
+  repeticiones_calentamiento: 10
+  batch_inferencia: 1         # escenario real: una foto a la vez
+
+# -----------------------------------------------------------------------------
+# INCLINOMETRIA (OpenCV: Canny + Hough)
+# -----------------------------------------------------------------------------
+inclinacion:
+  desenfoque_kernel: 5        # gaussiano; impar. Suprime ruido antes de Canny
+  canny_umbral_bajo: 50
+  canny_umbral_alto: 150
+  hough_rho: 1                # resolucion de distancia (px)
+  hough_theta_grados: 1.0     # resolucion angular
+  hough_umbral: 60            # votos minimos para aceptar una linea
+  hough_min_longitud_linea: 120
+  hough_max_separacion: 10    # maxGap: huecos tolerados dentro de una linea
+  # Solo se consideran "elemento vertical" las lineas cuya desviacion respecto
+  # a la vertical sea menor a este valor. Filtra suelos, dinteles y horizontes.
+  tolerancia_vertical_grados: 35.0
+  # Numero minimo de lineas coherentes para dar el angulo por fiable.
+  min_lineas_confiables: 3
+  # Longitud minima como fraccion del lado menor de la imagen (independiza el
+  # filtro de la resolucion de la foto).
+  min_longitud_relativa: 0.15
+
+# Clasificacion de orientacion de la grieta con la misma transformada de Hough.
+# Umbrales en grados respecto a la horizontal (0 = horizontal, 90 = vertical).
+orientacion_grieta:
+  umbral_horizontal: 25.0     # |angulo| < 25  -> horizontal
+  umbral_vertical: 65.0       # |angulo| > 65  -> vertical ; resto -> diagonal
+
+# -----------------------------------------------------------------------------
+# MOTOR DE REGLAS DE RIESGO
+# Contexto normativo: NSR-10 (Reglamento Colombiano de Construccion Sismo
+# Resistente). Los valores son criterios de tamizaje para inspeccion visual
+# rapida, NO limites normativos de aceptacion estructural.
+# -----------------------------------------------------------------------------
+riesgo:
+  # Probabilidad de grieta a partir de la cual se considera que hay grieta.
+  umbral_grieta: 0.5
+  # Probabilidad alta: evidencia fuerte, sube el nivel por si sola en elementos
+  # criticos.
+  umbral_grieta_alta: 0.85
+
+  # Desaplome (desviacion respecto a la vertical) en grados.
+  # Referencia: la NSR-10 (Titulo A, derivas) limita la deriva de piso al 1.0%
+  # de la altura de entrepiso para estructuras de concreto = ~0.57 grados.
+  # Se toma 1.0 grado como umbral de atencion (margen de medicion fotografica)
+  # y 2.0 grados (~3.5% de deriva) como desaplome severo.
+  desaplome_atencion_grados: 1.0
+  desaplome_severo_grados: 2.0
+
+  # Elementos considerados criticos: su falla compromete la estabilidad global
+  # (NSR-10 Titulo C). Un muro divisorio no portante no esta en esta lista.
+  elementos_criticos: ["columna", "viga", "muro_portante"]
+
+  # Orientaciones de grieta consideradas de alta gravedad segun el elemento.
+  # Justificacion en src/risk/reglas.py y en reports/analisis.md.
+  orientaciones_graves:
+    muro_portante: ["diagonal"]
+    muro_divisorio: ["diagonal"]
+    columna: ["horizontal", "diagonal"]
+    viga: ["diagonal", "vertical"]
+    losa: ["diagonal"]
+
+  # Confianza minima del modulo de inclinometria para que sus reglas cuenten.
+  # Por debajo, el angulo se declara no fiable y no dispara reglas de desaplome.
+  min_confianza_inclinacion: 3
+
+# -----------------------------------------------------------------------------
+# APLICACION STREAMLIT
+# -----------------------------------------------------------------------------
+app:
+  titulo: "Evaluacion de Riesgo Estructural"
+  subtitulo: "Deteccion de grietas e inclinacion en elementos estructurales"
+  # Modelo cargado por defecto. La app permite conmutar en vivo entre .keras y
+  # .tflite para comparar latencias delante del jurado.
+  modelo_por_defecto: "keras"     # "keras" | "tflite"
+  archivo_keras: "models/mobilenetv2_finetuned.keras"
+  archivo_tflite: "models/mobilenetv2_int8.tflite"
+  archivo_baseline: "models/baseline_cnn.keras"
+  max_mb_subida: 10
+  aviso_legal: >-
+    Este prototipo es orientativo y de caracter academico. NO sustituye la
+    inspeccion de un ingeniero estructural matriculado ni constituye un
+    dictamen tecnico bajo la NSR-10.
+
+  equipo:
+    - nombre: "Integrante 1"
+      rol: "Datos y EDA"
+    - nombre: "Integrante 2"
+      rol: "Modelos y entrenamiento"
+    - nombre: "Integrante 3"
+      rol: "Vision clasica y motor de reglas"
+    - nombre: "Integrante 4"
+      rol: "Aplicacion y despliegue"
+

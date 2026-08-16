@@ -1,0 +1,75 @@
+{
+  "n_imagenes": 1,
+  "angulos_prueba": [
+    2.0,
+    5.0,
+    10.0
+  ],
+  "error_medio_global_grados": 0.039041803196447934,
+  "informes": [
+    {
+      "referencia_grados": 0.0,
+      "confianza_referencia": 9,
+      "casos": [
+        {
+          "rotacion_aplicada": 2.0,
+          "angulo_esperado": -2.0,
+          "angulo_estimado": -1.9349323095527697,
+          "fiable": true,
+          "confianza": 11,
+          "error_absoluto": 0.06506769044723026
+        },
+        {
+          "rotacion_aplicada": -2.0,
+          "angulo_esperado": 2.0,
+          "angulo_estimado": 1.9360215829274119,
+          "fiable": true,
+          "confianza": 8,
+          "error_absoluto": 0.06397841707258811
+        },
+        {
+          "rotacion_aplicada": 5.0,
+          "angulo_esperado": -5.0,
+          "angulo_estimado": -4.969740728110304,
+          "fiable": true,
+          "confianza": 19,
+          "error_absoluto": 0.030259271889695682
+        },
+        {
+          "rotacion_aplicada": -5.0,
+          "angulo_esperado": 5.0,
+          "angulo_estimado": 4.997942093927916,
+          "fiable": true,
+          "confianza": 16,
+          "error_absoluto": 0.0020579060720837816
+        },
+        {
+          "rotacion_aplicada": 10.0,
+          "angulo_esperado": -10.0,
+          "angulo_estimado": -9.945283178569746,
+          "fiable": true,
+          "confianza": 17,
+          "error_absoluto": 0.05471682143025447
+        },
+        {
+          "rotacion_aplicada": -10.0,
+          "angulo_esperado": 10.0,
+          "angulo_estimado": 9.981829287733165,
+          "fiable": true,
+          "confianza": 17,
+          "error_absoluto": 0.01817071226683531
+        }
+      ],
+      "error_medio_grados": 0.039041803196447934,
+      "error_maximo_grados": 0.06506769044723026,
+      "n_casos_fiables": 6,
+      "n_casos": 6,
+      "archivo": "WhatsApp Image 2026-08-15 at 11.17.17 AM (3).jpeg",
+      "orientacion_grieta": {
+        "orientacion": "vertical",
+        "angulo_grados": 88.97880590271076,
+        "confianza": 28
+      }
+    }
+  ]
+}
